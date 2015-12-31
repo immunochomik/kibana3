@@ -20,7 +20,6 @@ define([
 ],
 function (angular, app, _, $, kbn) {
   'use strict';
-
   var module = angular.module('kibana.panels.terms', []);
   app.useModule(module);
 
@@ -186,6 +185,9 @@ function (angular, app, _, $, kbn) {
               boolQuery,
               filterSrv.getBoolFilter(filterSrv.ids())
             )))).size(0);
+
+        var request2 = request
+
       }
       if($scope.panel.tmode === 'terms_stats') {
         request = request
@@ -202,12 +204,14 @@ function (angular, app, _, $, kbn) {
       }
 
       // Populate the inspector panel
+
       $scope.inspector = angular.toJson(JSON.parse(request.toString()),true);
 
       results = request.doSearch();
 
       // Populate scope when we have results
       results.then(function(results) {
+
         $scope.panelMeta.loading = false;
         if($scope.panel.tmode === 'terms') {
           $scope.hits = results.hits.total;
@@ -321,6 +325,7 @@ function (angular, app, _, $, kbn) {
 
           // Make a clone we can operate on.
           chartData = _.clone(scope.data);
+
           chartData = scope.panel.missing ? chartData :
             _.without(chartData,_.findWhere(chartData,{meta:'missing'}));
           chartData = scope.panel.other ? chartData :

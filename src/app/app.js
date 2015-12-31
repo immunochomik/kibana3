@@ -172,3 +172,7 @@ function (angular, $, _, appLevelRequire) {
 
   return app;
 });
+
+function p(x){
+  console.log(JSON.stringify(x, null, 2));
+}
