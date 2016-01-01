@@ -119,16 +119,28 @@ define([
         queries;
 
       request = $scope.ejs.Request().indices(dashboard.indices);
+      var request2 = $scope.ejs.Request().indices(dashboard.indices);
 
       $scope.panel.queries.ids = querySrv.idsByMode($scope.panel.queries);
       queries = querySrv.getQueryObjs($scope.panel.queries.ids);
 
+      var filter = filterSrv.getBoolFilter(filterSrv.ids());
 
       // This could probably be changed to a BoolFilter
       boolQuery = $scope.ejs.BoolQuery();
       _.each(queries,function(q) {
         boolQuery = boolQuery.should(querySrv.toEjsObj(q));
+        filter = filter.should(ejs.QueryFilter(querySrv.toEjsObj(q)));
       });
+
+      request2 = request2
+        .size(0)
+        .agg(ejs.FilterAggregation('stats')
+          .filter(filter)
+          .agg(ejs.ExtendedStatsAggregation('stats_x')
+            .field($scope.panel.field)));
+
+      p(request2._self());
 
       request = request
         .facet($scope.ejs.StatisticalFacet('stats')
@@ -139,10 +151,24 @@ define([
               filterSrv.getBoolFilter(filterSrv.ids())
               )))).size(0);
 
+
       _.each(queries, function (q) {
         var alias = q.alias || q.query;
+        var alias64 = btoa('stats_' + alias);
+        var aggr = ejs.ExtendedStatsAggregation('stats_x')
+          .field($scope.panel.field);
+        var filter = filterSrv.getBoolFilter(filterSrv.ids())
+          .mergeFilterMust(ejs.QueryFilter(querySrv.toEjsObj(q)));
+
+        request2 = request2
+          .size(0)
+          .agg(ejs.FilterAggregation(alias64 )
+            .filter(filter)
+            .agg(aggr));
+
         var query = $scope.ejs.BoolQuery();
         query.should(querySrv.toEjsObj(q));
+
         request.facet($scope.ejs.StatisticalFacet('stats_'+alias)
           .field($scope.panel.field)
           .facetFilter($scope.ejs.QueryFilter(
@@ -153,6 +179,8 @@ define([
           ))
         );
       });
+
+      p(request2._self());
 
       // Populate the inspector panel
       $scope.inspector = angular.toJson(JSON.parse(request.toString()),true);
@@ -177,8 +205,6 @@ define([
           value: value,
           rows: rows
         };
-
-        console.log($scope.data);
 
         $scope.$emit('render');
       });
