@@ -1,7 +1,6 @@
 # Kibana
-This is my attempt to support kibana 3 as i find it superior to kibana 4 in certain tasks like pain log discovery
-Therefore I will make it working with aggregation framework instead of facets so it will work against elasticsearch 2
-
+This is my attempt to support kibana 3 as I find it superior to kibana 4 in certain tasks like simple  log discovery
+Therefore I will make it work with aggregation framework instead of facets so it will work against elasticsearch 2
 
 ## Overview
 
