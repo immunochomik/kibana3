@@ -127,7 +127,7 @@ function (angular, app, _, $, kbn) {
       /** @scratch /panels/terms/5
        * tstat:: Terms_stats facet stats field
        */
-      tstat       : 'total',
+      tstat       : 'count',
       /** @scratch /panels/terms/5
        * valuefield:: Terms_stats facet value field
        */
@@ -146,6 +146,36 @@ function (angular, app, _, $, kbn) {
 
     };
 
+    $scope.prepareOrder = function(aggregation) {
+        switch ($scope.panel.order) {
+            case 'term':
+                return aggregation.order('_term', 'desc');
+            case 'reverse_count':
+                return aggregation.order('_count', 'asc');
+            case 'reverse_term':
+                return aggregation.order('_term', 'asc');
+            case 'sum':
+                return aggregation.order('stats.sum', 'desc');
+            case 'reverse_sum':
+                return aggregation.order('stats.sum', 'asc');
+            case 'avg':
+                return aggregation.order('stats.avg', 'desc');
+            case 'reverse_avg':
+                return aggregation.order('stats.avg', 'asc');
+            case 'min':
+                return aggregation.order('stats.min', 'desc');
+            case 'reverse_min':
+                return aggregation.order('stats.avg', 'asc');
+            case 'max':
+                return aggregation.order('stats.max', 'desc');
+            case 'reverse_max':
+                return aggregation.order('stats.avg', 'asc');
+            default :
+                return aggregation.order('_count', 'desc');
+        }
+        return aggregation;
+    };
+
     $scope.get_data = function() {
       // Make sure we have everything for the request to complete
       if(dashboard.indices.length === 0) {
@@ -162,7 +192,6 @@ function (angular, app, _, $, kbn) {
         $scope.panel.field+'.raw' : $scope.panel.field;
 
       request = $scope.ejs.Request().indices(dashboard.indices);
-      //var request2 = $scope.ejs.Request().indices(dashboard.indices);
 
       $scope.panel.queries.ids = querySrv.idsByMode($scope.panel.queries);
       queries = querySrv.getQueryObjs($scope.panel.queries.ids);
@@ -194,10 +223,10 @@ function (angular, app, _, $, kbn) {
              .query(boolQuery)
              .agg(ejs.FilterAggregation('filters')
                  .filter(filterSrv.getBoolFilter(filterSrv.ids()))
-                 .agg(ejs.TermsAggregation('field')
+                 .agg($scope.prepareOrder(ejs.TermsAggregation('field')
                      .field($scope.field)
                      .exclude($scope.panel.exclude)
-                     .size($scope.panel.size)
+                     .size($scope.panel.size))
              )
          );
 
@@ -213,17 +242,31 @@ function (angular, app, _, $, kbn) {
         //p(request2.getQuery());
       }
       if($scope.panel.tmode === 'terms_stats') {
-        request = request
-          .facet($scope.ejs.TermStatsFacet('terms')
-          .valueField($scope.panel.valuefield)
-          .keyField($scope.field)
-          .size($scope.panel.size)
-          .order($scope.panel.order)
-          .facetFilter($scope.ejs.QueryFilter(
-            $scope.ejs.FilteredQuery(
-              boolQuery,
-              filterSrv.getBoolFilter(filterSrv.ids())
-            )))).size(0);
+        //request = request
+        //  .facet($scope.ejs.TermStatsFacet('terms')
+        //  .valueField($scope.panel.valuefield)
+        //  .keyField($scope.field)
+        //  .size($scope.panel.size)
+        //  .order($scope.panel.order)
+        //  .facetFilter($scope.ejs.QueryFilter(
+        //    $scope.ejs.FilteredQuery(
+        //      boolQuery,
+        //      filterSrv.getBoolFilter(filterSrv.ids())
+        //    )))).size(0);
+
+          var request = request
+              .size(0)
+              .query(boolQuery)
+              .agg(ejs.FilterAggregation('filters')
+                  .filter(filterSrv.getBoolFilter(filterSrv.ids()))
+                  .agg($scope.prepareOrder(ejs.TermsAggregation('field')
+                      .field($scope.field)
+                      .exclude($scope.panel.exclude)
+                      .size($scope.panel.size)
+                      .agg(ejs.StatsAggregation('stats')
+                          .field($scope.panel.valuefield)
+                  ))));
+          //p(request._self());
       }
 
       // Populate the inspector panel
@@ -271,7 +314,7 @@ function (angular, app, _, $, kbn) {
     };
 
     $scope.showMeta = function(term) {
-      if(_.isUndefined(term.meta)) {
+      if(_.isUndefined(term) || _.isUndefined(term.meta)) {
         return true;
       }
       if(term.meta === 'other' && !$scope.panel.other) {
@@ -308,28 +351,39 @@ function (angular, app, _, $, kbn) {
       link: function(scope, elem) {
           var plot;
 
-
           function build_results_aggregation() {
               var k = 0;
               scope.data = [];
-              _.each(scope.results.aggregations.filters.field.buckets, function(v) {
-                  var slice;
-                  if(scope.panel.tmode === 'terms') {
-                      slice = { label : v.key, data : [[k,v.doc_count]], actions: true};
-                  }
-                  if(scope.panel.tmode === 'terms_stats') {
-                      slice = { label : v.key, data : [[k,v[scope.panel.tstat]]], actions: true};
-                  }
-                  scope.data.push(slice);
-                  k = k + 1;
-              });
+              try {
+                  _.each(scope.results.aggregations.filters.field.buckets, function (v) {
+                      var slice;
+                      if (scope.panel.tmode === 'terms') {
+                          slice = {label: v.key, data: [[k, v.doc_count]], actions: true};
+                      }
+                      if (scope.panel.tmode === 'terms_stats') {
+                          slice = {label: v.key, data: [[k, v.stats[scope.panel.tstat]]], actions: true};
+                      }
+                      scope.data.push(slice);
+                      k = k + 1;
+                  });
 
-              scope.data.push({label:'Missing field',
-                  data:[[k,'unknown']],meta:"missing",color:'#aaa',opacity:0});
+                  scope.data.push({
+                      label: 'Missing field',
+                      data: [[k, 'unknown']], meta: "missing", color: '#aaa', opacity: 0
+                  });
 
-              if(scope.panel.tmode === 'terms') {
-                  scope.data.push({label:'Other values',
-                      data:[[k+1,scope.results.aggregations.filters.field.sum_other_doc_count]],meta:"other",color:'#444'});
+                  if (scope.panel.tmode === 'terms') {
+                      scope.data.push({
+                          label: 'Other values',
+                          data: [[k + 1, scope.results.aggregations.filters.field.sum_other_doc_count]],
+                          meta: "other",
+                          color: '#444'
+                      });
+                  }
+              } catch (e) {
+                  // when you change from terms to terms stats it is doing that with scope.panel.tmode === 'terms_stats'
+                  // but still data for ordinary terms i do not know how to fix that so the try and catch for now
+                  p(e);
               }
           }
 
@@ -366,7 +420,7 @@ function (angular, app, _, $, kbn) {
         function render_panel() {
           var chartData;
 
-          build_results_aggregation();
+            build_results_aggregation();
 
           // IE doesn't work without this
           elem.css({height:scope.panel.height||scope.row.height});
