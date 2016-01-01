@@ -5895,8 +5895,13 @@
         }
         
         return this;
+      },
+
+      mergeFilterMust: function(oFilter) {
+         filter.bool.must.push(oFilter.toJSON());
+         return this;
       }
-      
+
     });
   };
 
@@ -16294,7 +16299,6 @@
         if (!isFacet(facet)) {
           throw new TypeError('Argument must be a Facet');
         }
-        console.log(query);
         extend(query.facets, facet.toJSON());
         return this;
       },

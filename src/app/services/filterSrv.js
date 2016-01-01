@@ -162,6 +162,7 @@ define([
       if(!filter.active) {
         return false;
       }
+
       switch(filter.type)
       {
       case 'time':

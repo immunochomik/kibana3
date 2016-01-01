@@ -193,12 +193,10 @@ function (angular, app, _, $, kbn) {
 
       request = $scope.ejs.Request().indices(dashboard.indices);
 
+      // add up all queries
       $scope.panel.queries.ids = querySrv.idsByMode($scope.panel.queries);
       queries = querySrv.getQueryObjs($scope.panel.queries.ids);
-
-      // This could probably be changed to a BoolFilter
       boolQuery = $scope.ejs.BoolQuery();
-
       _.each(queries,function(q) {
         boolQuery = boolQuery.must(
             querySrv.toEjsObj(q));
