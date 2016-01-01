@@ -131,11 +131,9 @@ define([
       var bool = ejs.BoolFilter();
       // there is no way to introspect the BoolFilter and find out if it has a filter. We must keep note.
       var added_a_filter = false;
-
       _.each(ids,function(id) {
         if(dashboard.current.services.filter.list[id].active) {
           added_a_filter = true;
-
           switch(dashboard.current.services.filter.list[id].mandate)
           {
           case 'mustNot':
@@ -179,7 +177,7 @@ define([
       case 'querystring':
         return ejs.QueryFilter(ejs.QueryStringQuery(filter.query)).cache(true);
       case 'field':
-        return ejs.QueryFilter(ejs.QueryStringQuery(filter.field+":("+filter.query+")")).cache(true);
+        return ejs.QueryFilter(ejs.QueryStringQuery(filter.field+":("+filter.query+")"));
       case 'terms':
         return ejs.TermsFilter(filter.field,filter.value);
       case 'exists':

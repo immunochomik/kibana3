@@ -162,7 +162,7 @@ function (angular, app, _, $, kbn) {
         $scope.panel.field+'.raw' : $scope.panel.field;
 
       request = $scope.ejs.Request().indices(dashboard.indices);
-      //var request2 = $scope.ejs.Request().indices(dashboard.indices);
+      var request2 = $scope.ejs.Request().indices(dashboard.indices);
 
       $scope.panel.queries.ids = querySrv.idsByMode($scope.panel.queries);
       queries = querySrv.getQueryObjs($scope.panel.queries.ids);
@@ -189,16 +189,11 @@ function (angular, app, _, $, kbn) {
         //      filterSrv.getBoolFilter(filterSrv.ids())
         //    )))).size(0);
 
-          request = request
+         var request = request
              .size(0)
              .query(boolQuery)
-             .agg(ejs.FilterAggregation('filters')
-                 .filter(filterSrv.getBoolFilter(filterSrv.ids()))
-                 .agg(ejs.TermsAggregation('field')
-                     .field($scope.field)
-                     .exclude($scope.panel.exclude)
-                     .size($scope.panel.size)
-             )
+             .agg(ejs.FilterAggregation('filters').filter(filterSrv.getBoolFilter(filterSrv.ids()))
+                 .agg(ejs.TermsAggregation('field').field($scope.field).exclude($scope.panel.exclude))
          );
 
           //var request2 = request2
@@ -308,31 +303,6 @@ function (angular, app, _, $, kbn) {
       link: function(scope, elem) {
           var plot;
 
-
-          function build_results_aggregation() {
-              var k = 0;
-              scope.data = [];
-              _.each(scope.results.aggregations.filters.field.buckets, function(v) {
-                  var slice;
-                  if(scope.panel.tmode === 'terms') {
-                      slice = { label : v.key, data : [[k,v.doc_count]], actions: true};
-                  }
-                  if(scope.panel.tmode === 'terms_stats') {
-                      slice = { label : v.key, data : [[k,v[scope.panel.tstat]]], actions: true};
-                  }
-                  scope.data.push(slice);
-                  k = k + 1;
-              });
-
-              scope.data.push({label:'Missing field',
-                  data:[[k,'unknown']],meta:"missing",color:'#aaa',opacity:0});
-
-              if(scope.panel.tmode === 'terms') {
-                  scope.data.push({label:'Other values',
-                      data:[[k+1,scope.results.aggregations.filters.field.sum_other_doc_count]],meta:"other",color:'#444'});
-              }
-          }
-
           function build_results() {
               var k = 0;
               scope.data = [];
@@ -366,7 +336,7 @@ function (angular, app, _, $, kbn) {
         function render_panel() {
           var chartData;
 
-          build_results_aggregation();
+          build_results();
 
           // IE doesn't work without this
           elem.css({height:scope.panel.height||scope.row.height});

@@ -206,7 +206,7 @@ function (angular, _, config, kbn) {
       switch(q.type)
       {
       case 'lucene':
-        return ejs.QueryStringQuery(q.query || '*');
+        return ejs.QueryStringQuery().query(q.query || '*');
       case 'regex':
         return ejs.RegexpQuery('_all',q.query);
       default:

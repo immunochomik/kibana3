@@ -923,6 +923,7 @@
     });
   };
 
+
   /**
     @mixin
     <p>The QueryMixin provides support for common options used across 
@@ -5799,12 +5800,12 @@
           return filter.bool.must;
         }
 
-        if (isFilter(oFilter)) {
+        if (isFilter(oFilter) || isQuery(oFilter)) {
           filter.bool.must.push(oFilter.toJSON());
         } else if (isArray(oFilter)) {
           filter.bool.must = [];
           for (i = 0, len = oFilter.length; i < len; i++) {
-            if (!isFilter(oFilter[i])) {
+            if (!isFilter(oFilter[i]) && !isQuery(oFilter[i])) {
               throw new TypeError('Argument must be an array of Filters');
             }
             
@@ -8828,7 +8829,7 @@
       query = _common.toJSON();
 
     return extend(_common, {
-
+        
       /**
              Adds query to boolean container. Given query "must" appear in matching documents.
 
@@ -8847,12 +8848,12 @@
           return query.bool.must;
         }
 
-        if (isQuery(oQuery)) {
+        if (isQuery(oQuery) || isFilter(oQuery)) {
           query.bool.must.push(oQuery.toJSON());
         } else if (isArray(oQuery)) {
           query.bool.must = [];
           for (i = 0, len = oQuery.length; i < len; i++) {
-            if (!isQuery(oQuery[i])) {
+            if (!isQuery(oQuery[i]) && !isFilter(oQuery[i]) ) {
               throw new TypeError('Argument must be an array of Queries');
             }
             
@@ -12862,6 +12863,7 @@
 
     query.query_string.query = qstr;
 
+
     return extend(_common, {
 
       /**
@@ -16294,7 +16296,6 @@
         if (!isFacet(facet)) {
           throw new TypeError('Argument must be a Facet');
         }
-        console.log(query);
         extend(query.facets, facet.toJSON());
         return this;
       },
@@ -16351,8 +16352,8 @@
           return query.filter;
         }
 
-        if (!isFilter(filter)) {
-          throw new TypeError('Argument must be a Filter');
+        if (!isFilter(filter) && !isQuery(filter)) {
+            throw new TypeError('Argument must be a Filter');
         }
 
         query.filter = filter.toJSON();
@@ -16742,9 +16743,9 @@
         return JSON.stringify(query);
       },
 
-        getQuery : function () {
-            return query;
-        }
+      getQuery : function() {
+        return query;
+      }
     };
   };
 
