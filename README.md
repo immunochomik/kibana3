@@ -6,10 +6,11 @@ Following panels are already done and working:
 - histogram,
 - stats,
 - table,
-- goal,
+- goal
 
-It is actually all the functionality that I need to have basic what is going on look into our access logs and error logs and event logs,
+If you are anything as me and need kibana tool to get quick insight into what is going on in access or error logs, then kibana 3 is better choice than kibana 4 and this fork of it is already working and ready to use.
 
+Kibana 4 has the discovery panel in it witch is suppose to allow just that, but simple dashboard build in kibana 3 with the time histogram, few terms panels and documents table pane are vastly superior in providing the insight that you need. 
 
 I am going to try to add missing panels:
 - histograms that are not time based,
