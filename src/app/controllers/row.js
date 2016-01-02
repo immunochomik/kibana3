@@ -59,6 +59,7 @@ function (angular, app, _) {
       };
 
       $scope.duplicate_panel = function(panel) {
+        p(panel);
         var clone = angular.copy(panel);
         $scope.row.panels.push(clone);
       };
