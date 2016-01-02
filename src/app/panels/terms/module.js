@@ -198,7 +198,7 @@ function (angular, app, _, $, kbn) {
       queries = querySrv.getQueryObjs($scope.panel.queries.ids);
       boolQuery = $scope.ejs.BoolQuery();
       _.each(queries,function(q) {
-        boolQuery = boolQuery.must(
+        boolQuery = boolQuery.should(
             querySrv.toEjsObj(q));
       });
 

@@ -195,7 +195,7 @@ function (angular, app, _, kbn, moment) {
         $scope.adhocOpts = {
           height: "200px",
           field: field,
-          mode: 'mean',
+          mode: 'avg',
           span: $scope.panel.span,
           type: 'stats',
           title: 'Statistics for ' + field
