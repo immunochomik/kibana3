@@ -7,6 +7,7 @@ Following panels are already done and working:
 - stats,
 - table,
 - goal,
+
 It is actually all the functionality that I need to have basic what is going on look into our access logs and error logs and event logs,
 
 
@@ -16,6 +17,6 @@ I am going to try to add missing panels:
 
 
 ## Installation
-I have no idea about proper javascript development as I am an PHP guy, so i can not advise about grunt or gulp or whatever
-To install the project just download it and serve with any webserver with src dir being the root
+I have no idea about proper javascript development as I am a PHP guy, so I can not advise about grunt or gulp or whatever.
+To install the project just download it and serve with any web server, where src dir being the root, as you want them to get src/index.html
 you need to point it at the elastic search in src/config.js and then it just work.
