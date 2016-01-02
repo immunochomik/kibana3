@@ -349,10 +349,6 @@ define([
         queries = querySrv.getQueryObjs($scope.panel.queries.ids);
         // Build the query
         _.each(queries, function(q) {
-          //var query = $scope.ejs.FilteredQuery(
-          //  querySrv.toEjsObj(q),
-          //  filterSrv.getBoolFilter(filterSrv.ids())
-          //);
 
           var aggr = ejs.DateHistogramAggregation('dh')
             .field($scope.panel.time_field)
@@ -367,7 +363,7 @@ define([
           }
 
           var filter = filterSrv.getBoolFilter(filterSrv.ids())
-            .mergeFilterMust(ejs.QueryFilter(querySrv.toEjsObj(q)));
+            .must(ejs.QueryFilter(querySrv.toEjsObj(q)));
 
           request = request
             .size($scope.panel.annotate.enable ? $scope.panel.annotate.size : 0)

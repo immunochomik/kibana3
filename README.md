@@ -6,6 +6,7 @@ Therefore I will make it work with aggregation framework instead of facets so it
 Following panels are already done and working:
 - terms,
 - histogram,
+- stats,
 - table
 
 

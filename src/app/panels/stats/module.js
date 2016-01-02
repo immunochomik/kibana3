@@ -55,7 +55,7 @@ define([
       description: 'A statistical panel for displaying aggregations using the Elastic Search statistical facet query.'
     };
 
-    $scope.modes = ['count','min','max','mean','total','variance','std_deviation','sum_of_squares'];
+    $scope.modes = ['count','min','max','avg','sum','variance','std_deviation','sum_of_squares'];
 
     var defaults = {
       queries     : {
@@ -106,6 +106,11 @@ define([
       }
     };
 
+    $scope.makeAlias = function (q) {
+      var alias = q.alias || q.query;
+      return btoa('stats_' + alias);
+    };
+
     $scope.get_data = function () {
       if(dashboard.indices.length === 0) {
         return;
@@ -115,11 +120,9 @@ define([
 
       var request,
         results,
-        boolQuery,
         queries;
 
       request = $scope.ejs.Request().indices(dashboard.indices);
-      var request2 = $scope.ejs.Request().indices(dashboard.indices);
 
       $scope.panel.queries.ids = querySrv.idsByMode($scope.panel.queries);
       queries = querySrv.getQueryObjs($scope.panel.queries.ids);
@@ -127,60 +130,30 @@ define([
       var filter = filterSrv.getBoolFilter(filterSrv.ids());
 
       // This could probably be changed to a BoolFilter
-      boolQuery = $scope.ejs.BoolQuery();
       _.each(queries,function(q) {
-        boolQuery = boolQuery.should(querySrv.toEjsObj(q));
         filter = filter.should(ejs.QueryFilter(querySrv.toEjsObj(q)));
       });
 
-      request2 = request2
+      request = request
         .size(0)
         .agg(ejs.FilterAggregation('stats')
           .filter(filter)
-          .agg(ejs.ExtendedStatsAggregation('stats_x')
+          .agg(ejs.ExtendedStatsAggregation('stats')
             .field($scope.panel.field)));
 
-      p(request2._self());
-
-      request = request
-        .facet($scope.ejs.StatisticalFacet('stats')
-          .field($scope.panel.field)
-          .facetFilter($scope.ejs.QueryFilter(
-            $scope.ejs.FilteredQuery(
-              boolQuery,
-              filterSrv.getBoolFilter(filterSrv.ids())
-              )))).size(0);
-
-
       _.each(queries, function (q) {
-        var alias = q.alias || q.query;
-        var alias64 = btoa('stats_' + alias);
-        var aggr = ejs.ExtendedStatsAggregation('stats_x')
+        var alias64 = $scope.makeAlias(q);
+        var aggr = ejs.ExtendedStatsAggregation('stats')
           .field($scope.panel.field);
         var filter = filterSrv.getBoolFilter(filterSrv.ids())
-          .mergeFilterMust(ejs.QueryFilter(querySrv.toEjsObj(q)));
+          .must(ejs.QueryFilter(querySrv.toEjsObj(q)));
 
-        request2 = request2
+        request = request
           .size(0)
           .agg(ejs.FilterAggregation(alias64 )
             .filter(filter)
             .agg(aggr));
-
-        var query = $scope.ejs.BoolQuery();
-        query.should(querySrv.toEjsObj(q));
-
-        request.facet($scope.ejs.StatisticalFacet('stats_'+alias)
-          .field($scope.panel.field)
-          .facetFilter($scope.ejs.QueryFilter(
-            $scope.ejs.FilteredQuery(
-              query,
-              filterSrv.getBoolFilter(filterSrv.ids())
-            )
-          ))
-        );
       });
-
-      p(request2._self());
 
       // Populate the inspector panel
       $scope.inspector = angular.toJson(JSON.parse(request.toString()),true);
@@ -189,15 +162,16 @@ define([
 
       results.then(function(results) {
         $scope.panelMeta.loading = false;
-        var value = results.facets.stats[$scope.panel.mode];
+        var value = results.aggregations.stats.stats[$scope.panel.mode];
 
         var rows = queries.map(function (q) {
           var alias = q.alias || q.query;
+          var alias64 = $scope.makeAlias(q);
           var obj = _.clone(q);
           obj.label = alias;
           obj.Label = alias.toLowerCase(); //sort field
-          obj.value = results.facets['stats_'+alias];
-          obj.Value = results.facets['stats_'+alias]; //sort field
+          obj.value = results.aggregations[alias64].stats;
+          obj.Value = results.aggregations[alias64].stats; //sort field
           return obj;
         });
 

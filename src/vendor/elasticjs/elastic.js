@@ -5896,12 +5896,6 @@
         
         return this;
       },
-
-      mergeFilterMust: function(oFilter) {
-         filter.bool.must.push(oFilter.toJSON());
-         return this;
-      }
-
     });
   };
 
