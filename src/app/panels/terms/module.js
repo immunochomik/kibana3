@@ -287,6 +287,20 @@ function (angular, app, _, $, kbn) {
       });
     };
 
+    $scope.make_queries = function()
+    {
+
+      var data = {};
+      data.field = $scope.panel.field;
+      data.terms = [];
+      _.each($scope.data, function(item) {
+        if(item.label !== 'Missing field' && item.label !== 'Other values') {
+          data.terms.push(item.label);
+        }
+      });
+      querySrv.make_queries_from_terms(data);
+    };
+
     $scope.build_search = function(term,negate) {
       if(_.isUndefined(term.meta)) {
         filterSrv.set({type:'terms',field:$scope.field,value:term.label,
@@ -382,30 +396,6 @@ function (angular, app, _, $, kbn) {
                   // when you change from terms to terms stats it is doing that with scope.panel.tmode === 'terms_stats'
                   // but still data for ordinary terms i do not know how to fix that so the try and catch for now
                   p(e);
-              }
-          }
-
-          function build_results() {
-              var k = 0;
-              scope.data = [];
-              _.each(scope.results.facets.terms.terms, function(v) {
-                  var slice;
-                  if(scope.panel.tmode === 'terms') {
-                      slice = { label : v.term, data : [[k,v.count]], actions: true};
-                  }
-                  if(scope.panel.tmode === 'terms_stats') {
-                      slice = { label : v.term, data : [[k,v[scope.panel.tstat]]], actions: true};
-                  }
-                  scope.data.push(slice);
-                  k = k + 1;
-              });
-
-              scope.data.push({label:'Missing field',
-                  data:[[k,scope.results.facets.terms.missing]],meta:"missing",color:'#aaa',opacity:0});
-
-              if(scope.panel.tmode === 'terms') {
-                  scope.data.push({label:'Other values',
-                      data:[[k+1,scope.results.facets.terms.other]],meta:"other",color:'#444'});
               }
           }
 

@@ -9,7 +9,7 @@ function (angular, _, config, kbn) {
 
   var module = angular.module('kibana.services');
 
-  module.service('querySrv', function(dashboard, ejsResource, filterSrv, esVersion, $q) {
+  module.service('querySrv', function($rootScope, dashboard, ejsResource, filterSrv, esVersion, $q) {
 
     // Save a reference to this
     var self = this;
@@ -160,9 +160,19 @@ function (angular, _, config, kbn) {
       }
     };
 
+    this.make_queries_from_terms = function(data) {
+      _.each(data.terms, function(term) {
+        var q = self.defaults({});
+        q.query = data.field +':'+term;
+        self.set(q);
+      });
+      self.resolve().then(function(){$rootScope.$broadcast('refresh');});
+    };
+
     // This is used both for adding queries and modifying them. If an id is passed,
     // the query at that id is updated
     this.set = function(query,id) {
+
       if(!_.isUndefined(id)) {
         if(!_.isUndefined(dashboard.current.services.query.list[id])) {
           _.extend(dashboard.current.services.query.list[id],query);
@@ -176,11 +186,14 @@ function (angular, _, config, kbn) {
         query.color = query.color || colorAt(query.id);
         // Then it can get defaults
         query = self.defaults(query);
+        //p(query);
         dashboard.current.services.query.list[query.id] = query;
         dashboard.current.services.query.ids.push(query.id);
         return query.id;
       }
     };
+
+
 
     this.defaults = function(query) {
       _.defaults(query,_query);

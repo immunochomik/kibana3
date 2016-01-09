@@ -11,6 +11,7 @@ function (angular,$) {
       var container = '<div class="panel-container"></div>';
       var content = '<div class="panel-content" ng-style="{\'min-height\':row.height}"></div>';
 
+
       var panelHeader =
       '<div class="panel-header">'+
         '<div class="row-fluid">' +
