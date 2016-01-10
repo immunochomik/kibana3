@@ -161,10 +161,18 @@ function (angular, _, config, kbn) {
     };
 
     this.make_queries_from_terms = function(data) {
+      var currentQueries = {};
+      _.each(dashboard.current.services.query.list, function(q) {
+        currentQueries[q.query] = 1;
+      });
       _.each(data.terms, function(term) {
-        var q = self.defaults({});
-        q.query = data.field +':'+term;
-        self.set(q);
+        var description = data.field +':'+term;
+        if(_.isUndefined(currentQueries[description])) {
+          var q = self.defaults({});
+          q.query = description;
+          self.set(q);
+          currentQueries[description] = 1;
+        }
       });
       self.resolve().then(function(){$rootScope.$broadcast('refresh');});
     };
