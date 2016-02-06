@@ -17,4 +17,4 @@ And if you need to point that dashboard onto different index, - nothing is simpl
 ## Installation
 I have no idea about proper javascript development as I am a PHP guy, so I can not advise about grunt or gulp or whatever.
 To install the project just download it and serve with any web server, where src dir being the root, as you want them to get src/index.html.
-You need to point it at the elastic search in src/config.js and then it just work.
+You need to point it at the elasticsearch in src/config.js and then it just work.
