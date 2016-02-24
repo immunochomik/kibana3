@@ -359,7 +359,11 @@ define([
               $scope.panel.error = "In " + $scope.panel.mode + " mode a field must be specified";
               return;
             }
-            aggr = aggr.agg(ejs.StatsAggregation('stats').field($scope.panel.value_field));
+            if($scope.panel.mode === 'unique') {
+              aggr = aggr.agg(ejs.CardinalityAggregation('unique').field($scope.panel.value_field));
+            } else {
+              aggr = aggr.agg(ejs.StatsAggregation('stats').field($scope.panel.value_field));
+            }
           }
 
           var filter = filterSrv.getBoolFilter(filterSrv.ids())
@@ -420,7 +424,7 @@ define([
 
             _.each(queries, function(q) {
               var query_results = results.aggregations[q.id];
-
+              p(query_results);
               // we need to initialize the data variable on the first run,
               // and when we are working on the first segment of the data.
               if(_.isUndefined(data[i]) || segment === 0) {
@@ -449,6 +453,8 @@ define([
 
                 if($scope.panel.mode === 'count') {
                   value = (time_series._data[entry.key] || 0) + entry.doc_count;
+                } else if($scope.panel.mode === 'unique') {
+                  value = entry.unique.value;
                 } else if ($scope.panel.mode === 'avg') {
                   // Compute the ongoing mean by
                   // multiplying the existing mean by the existing hits
