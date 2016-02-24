@@ -160,12 +160,23 @@ function (angular, _, config, kbn) {
       }
     };
 
+    var surround_with_quotes_if_tokens = function (term) {
+      [' ', '_', '/', /\\/].some( function(s) {
+        if(term.search(s) != -1) {
+          term = '"'+term+'"';
+          return true;
+        }
+      });
+      return term;
+    };
+
     this.make_queries_from_terms = function(data) {
       var currentQueries = {};
       _.each(dashboard.current.services.query.list, function(q) {
         currentQueries[q.query] = 1;
       });
       _.each(data.terms, function(term) {
+        term = surround_with_quotes_if_tokens(term);
         var description = data.field +':'+term;
         if(_.isUndefined(currentQueries[description])) {
           var q = self.defaults({});
