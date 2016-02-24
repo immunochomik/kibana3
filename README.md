@@ -1,5 +1,5 @@
 # Kibana
-This is an attempt to support Kibana 3 as I find it nice and easier to work with than Kibana 4. This fork of kibana 3 does work against Elasticsearch 2.1 that was actually main point of the fork, the purpose was to make it to talk aggregations instead of facets.
+This is an attempt to support Kibana 3 as I find it nice and easier to work with than Kibana 4. This fork of kibana 3 does work against Elasticsearch 2.2 that was actually main point of the fork, the purpose was to make it to talk aggregations instead of facets.
 
 Following panels are already done and working:
 - terms,
@@ -7,6 +7,8 @@ Following panels are already done and working:
 - stats,
 - table,
 - goal
+
+Now unique count (cardinality aggregation) is supported in time histograms. 
 
 If you are anything like me and need kibana tool to get quick insight into what is going on in access or error logs, then kibana 3 is better choice than kibana 4 and this fork of it is already working and ready to use.
 
