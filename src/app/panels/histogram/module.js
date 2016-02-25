@@ -424,7 +424,6 @@ define([
 
             _.each(queries, function(q) {
               var query_results = results.aggregations[q.id];
-              p(query_results);
               // we need to initialize the data variable on the first run,
               // and when we are working on the first segment of the data.
               if(_.isUndefined(data[i]) || segment === 0) {

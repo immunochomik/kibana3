@@ -150,6 +150,10 @@ function (angular, app, _, $, kbn) {
         switch ($scope.panel.order) {
             case 'term':
                 return aggregation.order('_term', 'desc');
+            case 'reverse_unique':
+                return aggregation.order('unique', 'asc');
+            case 'unique':
+                return aggregation.order('unique', 'desc');
             case 'reverse_count':
                 return aggregation.order('_count', 'asc');
             case 'reverse_term':
@@ -173,7 +177,6 @@ function (angular, app, _, $, kbn) {
             default :
                 return aggregation.order('_count', 'desc');
         }
-        return aggregation;
     };
 
     $scope.get_data = function() {
@@ -239,7 +242,7 @@ function (angular, app, _, $, kbn) {
 
         //p(request2.getQuery());
       }
-      if($scope.panel.tmode === 'terms_stats') {
+      if($scope.panel.tmode === 'terms_stats' || $scope.panel.tmode === 'unique') {
         //request = request
         //  .facet($scope.ejs.TermStatsFacet('terms')
         //  .valueField($scope.panel.valuefield)
@@ -251,8 +254,16 @@ function (angular, app, _, $, kbn) {
         //      boolQuery,
         //      filterSrv.getBoolFilter(filterSrv.ids())
         //    )))).size(0);
+        var statsAggregationType;
+        if($scope.panel.tmode === 'unique') {
+          statsAggregationType = ejs.CardinalityAggregation('unique')
+            .field($scope.panel.valuefield);
+        } else {
+          statsAggregationType = ejs.StatsAggregation('stats')
+            .field($scope.panel.valuefield);
+        }
 
-          var request = request
+        var request = request
               .size(0)
               .query(boolQuery)
               .agg(ejs.FilterAggregation('filters')
@@ -261,9 +272,7 @@ function (angular, app, _, $, kbn) {
                       .field($scope.field)
                       .exclude($scope.panel.exclude)
                       .size($scope.panel.size)
-                      .agg(ejs.StatsAggregation('stats')
-                          .field($scope.panel.valuefield)
-                  ))));
+                      .agg( statsAggregationType ))));
           //p(request._self());
       }
 
@@ -372,9 +381,13 @@ function (angular, app, _, $, kbn) {
                       if (scope.panel.tmode === 'terms') {
                           slice = {label: v.key, data: [[k, v.doc_count]], actions: true};
                       }
-                      if (scope.panel.tmode === 'terms_stats') {
+                      else if (scope.panel.tmode === 'terms_stats' ) {
                           slice = {label: v.key, data: [[k, v.stats[scope.panel.tstat]]], actions: true};
                       }
+                      else if (scope.panel.tmode === 'unique' ) {
+                        slice = {label: v.key, data: [[k, v.unique['value']]], actions: true};
+                      }
+
                       scope.data.push(slice);
                       k = k + 1;
                   });

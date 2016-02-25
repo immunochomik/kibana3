@@ -3,7 +3,7 @@
       <h5>Parameters</h5>
       <div class="editor-option">
         <label class="small">Terms mode</label>
-        <select class="input-medium" ng-model="panel.tmode" ng-options="f for f in ['terms','terms_stats']" ng-change="set_refresh(true)"></select>
+        <select class="input-medium" ng-model="panel.tmode" ng-options="f for f in ['terms','terms_stats','unique']" ng-change="set_refresh(true)"></select>
       </div>
       <div class="editor-option" ng-show="panel.tmode == 'terms_stats'">
         <label class="small">Stats type</label>
@@ -13,7 +13,7 @@
         <label class="small">Field</label>
         <input type="text" class="input-small" bs-typeahead="fields.list" ng-model="panel.field" ng-change="set_refresh(true)">
       </div>
-      <div class="editor-option" ng-show="panel.tmode == 'terms_stats'">
+      <div class="editor-option" ng-show="panel.tmode == 'terms_stats' || panel.tmode == 'unique'">
         <label class="small">Value field</label>
         <input type="text" class="input-small" bs-typeahead="fields.list" ng-model="panel.valuefield" ng-change="set_refresh(true)">
       </div>
@@ -24,6 +24,7 @@
       <div class="editor-option">
         <label class="small">Order</label>
         <select class="input-medium" ng-model="panel.order" ng-options="f for f in ['count','term','reverse_count','reverse_term']" ng-change="set_refresh(true)"  ng-show="panel.tmode == 'terms'"></select>
+        <select class="input-medium" ng-model="panel.order" ng-options="f for f in ['unique','term','reverse_unique','reverse_term']" ng-change="set_refresh(true)"  ng-show="panel.tmode == 'unique'"></select>
         <select class="input-medium" ng-model="panel.order" ng-options="f for f in ['term', 'reverse_term', 'count', 'reverse_count', 'sum', 'reverse_sum', 'min', 'reverse_min', 'max', 'reverse_max', 'avg', 'reverse_avg']" ng-change="set_refresh(true)"  ng-show="panel.tmode == 'terms_stats'"></select>
       </div>
       <div class="editor-option" ng-show="panel.tmode == 'terms'">
