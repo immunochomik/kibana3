@@ -176,7 +176,9 @@ function (angular, _, config, kbn) {
         currentQueries[q.query] = 1;
       });
       _.each(data.terms, function(term) {
-        term = surround_with_quotes_if_tokens(term);
+        if (_.isString(term)) {
+          term = surround_with_quotes_if_tokens(term);
+        }
         var description = data.field +':'+term;
         if(_.isUndefined(currentQueries[description])) {
           var q = self.defaults({});
