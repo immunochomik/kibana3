@@ -4,7 +4,7 @@
       <span class="begin-query">
         <i class="pointer" ng-class="queryIcon(dashboard.current.services.query.list[id].type)" ng-show="dashboard.current.services.query.list[id].enable" data-unique="1" bs-popover="'app/panels/query/meta.html'" data-placement="bottomLeft" ng-style="{color: dashboard.current.services.query.list[id].color}"></i>
         <i class="pointer icon-circle-blank" ng-click="dashboard.current.services.query.list[id].enable=true;dashboard.refresh();" ng-hide="dashboard.current.services.query.list[id].enable" bs-tooltip="'Activate query'" ng-style="{color: dashboard.current.services.query.list[id].color}"></i>
-        <i class="icon-remove-sign pointer remove-query" ng-show="dashboard.current.services.query.ids.length > 1" ng-click="querySrv.remove(id);refresh()"></i>
+        <i class="icon-remove-sign pointer remove-query" ng-show="dashboard.current.services.query.ids.length > 1" ng-click="querySrv.remove(id)"></i>
       </span>
       <span>
         <input class="search-query panel-query" ng-disabled="!dashboard.current.services.query.list[id].enable" ng-class="{ 'input-block-level': unPinnedQueries.length==1, 'last-query': $last, 'has-remove': dashboard.current.services.query.ids.length > 1 }" bs-typeahead="panel.history" data-min-length=0 data-items=100 type="text" ng-model="dashboard.current.services.query.list[id].query" />
