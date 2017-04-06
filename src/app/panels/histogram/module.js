@@ -341,11 +341,7 @@ define([
         $scope.panelMeta.loading = true;
         request = $scope.ejs.Request().indices(dashboard.indices[segment]);
 
-        if (!$scope.panel.annotate.enable) {
-          request.searchType("count");
-        }
-
-        $scope.panel.queries.ids = querySrv.idsByMode($scope.panel.queries);
+          $scope.panel.queries.ids = querySrv.idsByMode($scope.panel.queries);
         queries = querySrv.getQueryObjs($scope.panel.queries.ids);
         // Build the query
         _.each(queries, function(q) {
@@ -367,7 +363,7 @@ define([
           }
 
           var filter = filterSrv.getBoolFilter(filterSrv.ids())
-            .must(ejs.QueryFilter(querySrv.toEjsObj(q)));
+            .must(querySrv.toEjsObj(q));
 
           request = request
             .size($scope.panel.annotate.enable ? $scope.panel.annotate.size : 0)

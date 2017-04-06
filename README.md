@@ -1,14 +1,13 @@
 # Kibana
-This is an attempt to support Kibana 3 as I find it nice and easier to work with than Kibana 4. This fork of kibana 3 does work against Elasticsearch 2.2 that was actually main point of the fork, the purpose was to make it to talk aggregations instead of facets.
+This is the best and only Kibana 3 that is working with no joke Elasticsearch 5 
 
 Following panels are already done and working:
+- time histogram,
 - terms,
-- histogram,
 - stats,
-- table,
-- goal
+- table
 
-Now unique count (cardinality aggregation) is supported in time histograms. 
+Now unique count (cardinality aggregation) is supported in time histograms and terms. 
 
 If you are anything like me and need kibana tool to get quick insight into what is going on in access or error logs, then kibana 3 is better choice than kibana 4 and this fork of it is already working and ready to use.
 
@@ -17,6 +16,4 @@ And if you need to point that dashboard onto different index, - nothing is simpl
 
 
 ## Installation
-I have no idea about proper javascript development as I am a PHP guy, so I can not advise about grunt or gulp or whatever.
-To install the project just download it and serve with any web server, where src dir being the root, as you want them to get src/index.html.
-You need to point it at the elasticsearch in src/config.js and then it just work.
+There is not build process so just serve the content of src folder with a web server

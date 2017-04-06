@@ -127,6 +127,16 @@ define([
       return ids;
     };
 
+    this.toFilter = function(ids) {
+      var bool = ejs.BoolFilter();
+      _.each(ids,function(id) {
+        if(dashboard.current.services.filter.list[id].active) {
+          bool.filter(self.getEjsObj(id));
+        }
+      });
+      return bool;
+    };
+
     this.getBoolFilter = function(ids) {
       var bool = ejs.BoolFilter();
       // there is no way to introspect the BoolFilter and find out if it has a filter. We must keep note.
@@ -176,11 +186,11 @@ define([
           .from(filter.from)
           .to(filter.to);
       case 'querystring':
-        return ejs.QueryFilter(ejs.QueryStringQuery(filter.query)).cache(true);
+        return ejs.QueryStringQuery(filter.query);
       case 'field':
-        return ejs.QueryFilter(ejs.QueryStringQuery(filter.field+":("+filter.query+")"));
+        return ejs.QueryStringQuery(filter.field+":("+filter.query+")");
       case 'terms':
-        return ejs.TermsFilter(filter.field,filter.value);
+        return ejs.TermFilter(filter.field,filter.value);
       case 'exists':
         return ejs.ExistsFilter(filter.field);
       case 'missing':

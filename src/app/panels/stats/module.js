@@ -131,7 +131,7 @@ define([
 
       // This could probably be changed to a BoolFilter
       _.each(queries,function(q) {
-        filter = filter.should(ejs.QueryFilter(querySrv.toEjsObj(q)));
+        filter = filter.should(querySrv.toEjsObj(q));
       });
 
       request = request
@@ -146,7 +146,7 @@ define([
         var aggr = ejs.ExtendedStatsAggregation('stats')
           .field($scope.panel.field);
         var filter = filterSrv.getBoolFilter(filterSrv.ids())
-          .must(ejs.QueryFilter(querySrv.toEjsObj(q)));
+          .must(querySrv.toEjsObj(q));
 
         request = request
           .size(0)

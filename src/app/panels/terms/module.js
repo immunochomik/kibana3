@@ -207,17 +207,6 @@ function (angular, app, _, $, kbn) {
 
       // Terms mode
       if($scope.panel.tmode === 'terms') {
-        //request = request
-        //  .facet($scope.ejs.TermsFacet('terms')
-        //  .field($scope.field)
-        //  .size($scope.panel.size)
-        //  .order($scope.panel.order)
-        //  .exclude($scope.panel.exclude)
-        //  .facetFilter($scope.ejs.QueryFilter(
-        //    $scope.ejs.FilteredQuery(
-        //      boolQuery,
-        //      filterSrv.getBoolFilter(filterSrv.ids())
-        //    )))).size(0);
 
           request = request
              .size(0)
@@ -226,34 +215,14 @@ function (angular, app, _, $, kbn) {
                  .filter(filterSrv.getBoolFilter(filterSrv.ids()))
                  .agg($scope.prepareOrder(ejs.TermsAggregation('field')
                      .field($scope.field)
-                     .exclude($scope.panel.exclude)
+                     //.exclude($scope.panel.exclude)
                      .size($scope.panel.size))
              )
          );
 
-          //var request2 = request2
-          //    .agg(ejs.FilterAggregation('foo')
-          //        .filter(ejs.BoolFilter()
-          //            .must(ejs.QueryStringQuery().query("*"))
-          //            .must(ejs.TermsQuery("shape", ["wc"]))
-          //        )
-          //        .agg(ejs.TermsAggregation("filed").field("shape").exclude({"pattern" : []})))
-          //    .size(0);
-
-        //p(request2.getQuery());
       }
       if($scope.panel.tmode === 'terms_stats' || $scope.panel.tmode === 'unique') {
-        //request = request
-        //  .facet($scope.ejs.TermStatsFacet('terms')
-        //  .valueField($scope.panel.valuefield)
-        //  .keyField($scope.field)
-        //  .size($scope.panel.size)
-        //  .order($scope.panel.order)
-        //  .facetFilter($scope.ejs.QueryFilter(
-        //    $scope.ejs.FilteredQuery(
-        //      boolQuery,
-        //      filterSrv.getBoolFilter(filterSrv.ids())
-        //    )))).size(0);
+
         var statsAggregationType;
         if($scope.panel.tmode === 'unique') {
           statsAggregationType = ejs.CardinalityAggregation('unique')
@@ -270,10 +239,9 @@ function (angular, app, _, $, kbn) {
                   .filter(filterSrv.getBoolFilter(filterSrv.ids()))
                   .agg($scope.prepareOrder(ejs.TermsAggregation('field')
                       .field($scope.field)
-                      .exclude($scope.panel.exclude)
+                      //.exclude($scope.panel.exclude)
                       .size($scope.panel.size)
                       .agg( statsAggregationType ))));
-          //p(request._self());
       }
 
       // Populate the inspector panel

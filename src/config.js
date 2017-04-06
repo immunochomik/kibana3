@@ -62,8 +62,8 @@ function (Settings) {
      */
     panel_names: [
       'histogram',
-      'map',
-      'goal',
+      //'map',
+      //'goal',
       'table',
       'filtering',
       'timepicker',
@@ -71,7 +71,7 @@ function (Settings) {
       //'hits',
       'column',
       //'trends',
-      'bettermap',
+      //'bettermap',
       'query',
       'terms',
       'stats',

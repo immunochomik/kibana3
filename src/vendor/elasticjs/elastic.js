@@ -179,7 +179,7 @@
   };
 
   isQuery = function (obj) {
-    return (isEJSObject(obj) && obj._type() === 'query');
+    return (isEJSObject(obj) && (obj._type() === 'query' || obj._type() === 'filter'));
   };
 
   isRescore = function (obj) {
@@ -187,7 +187,7 @@
   };
 
   isFilter = function (obj) {
-    return (isEJSObject(obj) && obj._type() === 'filter');
+    return (isEJSObject(obj) && (obj._type() === 'query' || obj._type() === 'filter'));
   };
 
   isFacet = function (obj) {
@@ -5817,6 +5817,35 @@
         return this;
       },
 
+      filter: function (oFilter) {
+        var i, len;
+
+        if (filter.bool.filter == null) {
+          filter.bool.filter = [];
+        }
+
+        if (oFilter == null) {
+          return filter.bool.filter;
+        }
+
+        if (isFilter(oFilter)) {
+          filter.bool.filter.push(oFilter.toJSON());
+        } else if (isArray(oFilter)) {
+          filter.bool.filter = [];
+          for (i = 0, len = oFilter.length; i < len; i++) {
+            if (!isFilter(oFilter[i])) {
+              throw new TypeError('Argument must be an array of Filters');
+            }
+
+            filter.bool.filter.push(oFilter[i].toJSON());
+          }
+        } else {
+          throw new TypeError('Argument must be a Filter or array of Filters');
+        }
+
+        return this;
+      },
+
       /**
              Adds filter to boolean container. Given filter "must not" appear 
              in matching documents. If passed a single Filter it is added to 
@@ -5879,12 +5908,12 @@
           return filter.bool.should;
         }
     
-        if (isFilter(oFilter)) {
+        if (isFilter(oFilter) || isQuery(oFilter)) {
           filter.bool.should.push(oFilter.toJSON());
         } else if (isArray(oFilter)) {
           filter.bool.should = [];
           for (i = 0, len = oFilter.length; i < len; i++) {
-            if (!isFilter(oFilter[i])) {
+            if (!(isFilter(oFilter[i]) || isQuery(oFilter[i])) ) {
               throw new TypeError('Argument must be an array of Filters');
             }
             
@@ -8935,6 +8964,35 @@
         
         return this;
       },
+
+      filter: function (oQuery) {
+        var i, len;
+
+        if (query.bool.filter == null) {
+          query.bool.filter = [];
+        }
+
+        if (oQuery == null) {
+          return query.bool.filter;
+        }
+        if (isQuery(oQuery)) {
+          query.bool.filter.push(oQuery._self());
+        } else if (isArray(oQuery)) {
+          query.bool.filter = [];
+          for (i = 0, len = oQuery.length; i < len; i++) {
+            if (!isQuery(oQuery[i])) {
+              throw new TypeError('Argument must be an array of Queries');
+            }
+
+            query.bool.filter.push(oQuery[i]._self());
+          }
+        } else {
+          throw new TypeError('Argument must be a Query or array of Queries');
+        }
+
+        return this;
+      },
+
 
       /**
             Sets if the <code>Query</code> should be enhanced with a

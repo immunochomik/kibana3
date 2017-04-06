@@ -373,7 +373,7 @@ function (angular, $, kbn, _, config, moment, Modernizr) {
       };
 
       ejs.client.get(
-        "/" + config.kibana_index + "/"+type+"/"+id+'?' + new Date().getTime(),
+        "/" + config.kibana_index + "/"+type+"/"+id,
         null, successcb, errorcb);
 
     };
