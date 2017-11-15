@@ -37,7 +37,7 @@ function (angular, app, _, kbn, moment) {
           show: $scope.panel.spyable
         },
         {
-          description: "Csv",
+          description: "CSV",
           icon: "icon-table",
           partial: "app/partials/csv.html",
           show: true,
@@ -311,6 +311,7 @@ function (angular, app, _, kbn, moment) {
         _segment,
         request,
         boolQuery,
+        boolQuery2, // to help put queries also into filter context
         queries,
         sort,
         request2;
@@ -341,9 +342,14 @@ function (angular, app, _, kbn, moment) {
 
       boolQuery = filterSrv.toFilter(filterSrv.ids());
 
+      // Put the queries into a separate bool context as should, so we get an OR of the queries
+      boolQuery2 = $scope.ejs.BoolFilter();
       _.each(queries,function(q) {
-        boolQuery = boolQuery.should(querySrv.toEjsObj(q));
+        boolQuery2 = boolQuery2.should(querySrv.toEjsObj(q));
       });
+
+      // put the queries also under filter context to actually perform filtering
+      boolQuery.filter(boolQuery2);
 
       request.query(boolQuery)
         .highlight(
